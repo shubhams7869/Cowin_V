@@ -2,7 +2,8 @@ function execute(){
 	setTimeout(run,4000);
 }
 async function run(){
-    let token=document.getElementById("auth-token").value ? document.getElementById("auth-token").value.toString(): "Default";
+    if(!checkLogin()) return;
+    let token=document.getElementById("auth-token").value ? document.getElementById("auth-token").value.toString(): "";
     this.bearer = "Bearer "+token;
 
     console.log(this.bearer);
@@ -25,7 +26,7 @@ async function run(){
 
 async function getList(){
 	
-	let token=document.getElementById("auth-token").value ? document.getElementById("auth-token").value.toString(): "Default";
+	let token=document.getElementById("auth-token").value ? document.getElementById("auth-token").value.toString(): "";
     this.bearer = "Bearer "+token;
 	
 	var aDate=document.getElementById("appDate").value?document.getElementById("appDate").value:new Date();
@@ -67,6 +68,14 @@ async function _getList(appDate, pin, bearer){
 async function generateOtp(){
     let url="https://cdn-api.co-vin.in/api/v2/auth/generateMobileOTP";
 	let mobile = document.getElementById("mobile").value;
+	var phoneno = /^\d{10}$/;
+	if(!mobile.match(phoneno))
+	{
+		var msg= mobile?'Not a valid Mobile number!!':'Enter a mobile number!!';
+		var alertDiv=document.getElementById("alertBox");
+		alertDiv.innerHTML="<div id='alertMsg' class='alert alert-danger alert-dismissible fade show'><strong>Error!</strong> "+msg+" . <button type='button' class='close' data-dismiss='alert'>&times;</button></div>";
+		return;
+	}
 	let reqdata='{"mobile": "'+mobile+'","secret":"U2FsdGVkX19/McGZM4NEQd5p2SWF6Y0xW3qN7nRTdVMFVEWX7p/TBUziMOxvFx/WBPyJm16JTvVGx3IK29kEsw=="}';
     let response= await fetch(url,{
         method: 'POST', // *GET, POST, PUT, DELETE, etc.
@@ -78,7 +87,7 @@ async function generateOtp(){
     });
     let data = await response.json();
 	this.txnId = data.txnId;
-	var htmlres="<div class='input-group'><label><input type='number' id='otp' placeholder='Enter OTP'/><input type='hidden' id='txnId' value='"+this.txnId+"'/></label>&nbsp;<button class='unit' type='button' onclick='confirmOtp()'><span class='iconify' data-icon='ion:arrow-forward' data-inline='false'></span></button></div>";
+	var htmlres="<div class='input-group'><label><input type='number' id='otp' placeholder='Enter OTP'/><input type='hidden' id='txnId' value='"+this.txnId+"'/></label>&nbsp;<button class='unit' type='unit' title='Validate OTP' onclick='confirmOtp()'><span class='iconify' data-icon='ic:baseline-mobile-friendly' data-inline='false'></span></button></div>";
 	document.getElementById("validateOtp").innerHTML=htmlres;
     return data;
 
@@ -103,9 +112,20 @@ async function confirmOtp(){
 
 }
 
+function checkLogin(){
+	let token=document.getElementById("auth-token").value ? document.getElementById("auth-token").value.toString(): "";
+	if(token==""){
+		var dlgBody="<div class='segment'><label id='generateOtp'><input type='tel' id='mobile' placeholder='Mobile Number'/></label>&nbsp;<button class='unit' type='button' title='Generate OTP' onclick='generateOtp()'><span class='iconify' data-icon='emojione-monotone:mobile-phone-with-arrow' data-inline='false'></span></button><br/><label id='validateOtp'/></div>";
+		showDialog("login","Login",dlgBody);
+		return;
+	}
+	else return true;
+}
+
 async function getBeneficiaries(){
 	let url="https://cdn-api.co-vin.in/api/v2/appointment/beneficiaries";
-	let token=document.getElementById("auth-token").value ? document.getElementById("auth-token").value.toString(): "Default";
+	if(!checkLogin()) return;
+	let token=document.getElementById("auth-token").value ? document.getElementById("auth-token").value.toString(): "";
     this.bearer = "Bearer "+token;
 	let response= await fetch(url,{
         method: 'GET', // *GET, POST, PUT, DELETE, etc.
@@ -145,4 +165,20 @@ async function _scheduleAppointment(sessId, bearer){
     });
     let data = await response.json();
     return data;
+}
+
+function showDialog(id,title,body)
+{
+	var dialogBox='<div id="'+id+'" title="'+title+'">'+body+'</div>';
+	var loginDialog=document.getElementById("alertBox");
+	loginDialog.innerHTML=dialogBox;
+	$("#"+id).css("text-color",'black');
+	$("#"+id).dialog({
+	  show: { effect: "blind", duration: 800 },
+	  appendTo: "body",
+	  dialogClass: "alert",
+	  hide: { effect: "explode", duration: 1000 },
+	  modal: true
+	});
+	$("#"+id).dialog( "open" );
 }

@@ -6,31 +6,39 @@
 		<script src="main.js" ></script>
 		<script src="SHA256.js" ></script>
 		<script src="https://code.iconify.design/1/1.0.7/iconify.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<link rel="stylesheet" href="/resources/demos/style.css">
+		<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     </head>
     <body>
 		<form>	
 			<div class="segment">
 				<h1>Cowin Schedule Appointment App</h1>
 			</div>
-			<div class="input-group">
-				<label><input type="date" id="appDate" data-date-format="DD MM YYYY" placeholder="dd-mm-yyyy" required/></label>&nbsp;
-				<label><input type="text" id="pin" placeholder="Pincode" required/></label>
-				<button class="unit" type="button" onclick="getList()"><span class="iconify" data-icon="ion:search-outline" data-inline="false"></span></button>
-			</div>
-			<br/>
-			<div class="input-group">
-				<label><input type="text" id="auth-token" placeholder="Enter Auth Token"/></label>&nbsp;
-				<button class="unit" type="button" onclick="run()"><span class="iconify" data-icon="ion:arrow-forward" data-inline="false"></span></button>
-			</div>
-			<div class="segment">
-				<label><input type="tel" id="mobile" placeholder="Mobile Number" pattern="^/d{10}$"/></label><br/>
-				<button class="red" type="button" onclick="generateOtp()">Generate OTP</button><br/>
-				<label id="validateOtp"/>
-			</div>
-			<div class="segment">
-				<button class="unit" type="button" onclick="getBeneficiaries()"><span class="iconify" data-icon="ion:people" data-inline="false"></span></button>
-				<button class="unit" type="button"><span class="iconify" data-icon="ion:newspaper" data-inline="false"></span></button>
-				<button class="unit" type="button"><span class="iconify" data-icon="ion:settings" data-inline="false"></span></button>
+			<div id='mainPage'>
+				<div class='input-group'>
+					<div id="alertBox"></div>
+				</div>
+				<br/>
+				<div class="input-group">
+					<label><input type="date" id="appDate" data-date-format="DD MM YYYY" placeholder="dd-mm-yyyy" required="required"/></label>&nbsp;
+					<label><input type="text" id="pin" placeholder="Pincode" required="required"/></label>
+					<button class="unit" type="button" title="Get Vaccination centers list." onclick="getList()"><span class="iconify" data-icon="ion:search-outline" data-inline="false"></span></button>
+				</div>
+				<br/>
+				<div class="input-group">
+					<label><input readonly type="text" id="auth-token" placeholder="Auth Token"/></label>
+				</div>
+				<div class='segment'><button class="red" type="button" onclick="run()" disabled="true">Schedule Appointment &nbsp; <span class="iconify" data-icon="ion:arrow-forward" data-inline="false"></span></button></div>
+				
+				<div class="segment">
+					<button class="unit" type="button" title="Get Beneficiaries" onclick="getBeneficiaries()"><span class="iconify" data-icon="ion:people" data-inline="false"></span></button>
+					<button class="unit" type="button"><span class="iconify" data-icon="ion:newspaper" data-inline="false"></span></button>
+					<button class="unit" type="button"><span class="iconify" data-icon="ion:settings" data-inline="false"></span></button>
+				</div>
 			</div>
 		  
 			
