@@ -1,26 +1,34 @@
 function execute(){
-	setTimeout(run,4000);
+	this.fee_type=document.getElementById("fee_type").value;
+	this.min_age_limit=document.getElementById("min_age_limit").value;
+	this.vaccine=document.getElementById("vaccine").value;
+	this.dose=document.getElementById("dose").value;
+	this.bens=document.getElementById("benList").value.split(',');
+	this.runId=setInterval(run,3500);
 }
 async function run(){
-    if(!checkLogin()) return;
+    await checkLogin();
     let token=document.getElementById("auth-token").value ? document.getElementById("auth-token").value.toString(): "";
     this.bearer = "Bearer "+token;
-
-    console.log(this.bearer);
     
     let list = await getList();
 
     for(i=0; i<list.centers.length;i++){
-        if(parseInt(list.centers[i].sessions[0].available_capacity)>0)
-            if(list.centers[i].sessions[0].min_age_limit=='18')
-                if(list.centers[i].center_id=="396505"){
+	if(this.fee_type=="all" || list.centers[i].fee_type==this.fee_type)
+	  if(this.vaccine=="all"||list.centers[i].sessions[0].vaccine==this.vaccine)
+            if(parseInt(this.dose=="dose1"?	list.centers[i].sessions[0].available_capacity_dose1:list.centers[i].sessions[0].available_capacity_dose2)>0)
+            	if(list.centers[i].sessions[0].min_age_limit==this.min_age_limit){
+                //if(list.centers[i].center_id=="396505") // center id for KBHB
                     sessId=list.centers[i].sessions[0].session_id;
-                    
+                    this.slots=list.centers[i].sessions[0].slots;
                     console.log("Trying to schedule Appointment...");
-                    res = await _scheduleAppointment(sessId, this.bearer);
+		    res = await _scheduleAppointment(sessId, this.bearer, this.bens);
+			if(res.appointment_id)clearInterval(this.runId);
                     console.log(res);
-                    }
-                }
+		}
+		
+    }
+                
 	document.getElementById("response").innerHTML=res;
 }
 
@@ -45,14 +53,14 @@ async function getList(){
 	var j=1;
 	for(i=0; i<list.centers.length;i++){
 		var ageLimit=list.centers[i].sessions[0].min_age_limit=='18'?"18+":"45+";
-		htmlStr+="<div class=\"list\"><h3>"+(j++)+'. '+list.centers[i].name+" - </h3>&nbsp;<h5 style='background: green; border-radius:25px;padding: 2px;'>"+ageLimit+"</h5><br><h2 style='text-align: center;'> - Slots: "+list.centers[i].sessions[0].available_capacity+"</h2></div>";
+		htmlStr+="<div class=\"list\"><label><h3>"+(j++)+'. '+list.centers[i].name+" - </h3></label>&nbsp;<label><h5 style='background: green; border-radius:25px;padding: 2px;'>"+ageLimit+"</h5></label><br><label><h2 style='text-align: center;'> - Slots: "+list.centers[i].sessions[0].available_capacity+"</h2></label></div>";
 	
 	}
-	document.getElementById("response").innerHTML=htmlStr==""?"No Vaccination center found for date: "+this.appDate+"and pincode: "+this.pin:htmlStr;
+	document.getElementById("response").innerHTML=htmlStr==""?"No Vaccination center found for date: "+this.appDate+" and pincode: "+this.pin:htmlStr;
 }
 
 async function _getList(appDate, pin, bearer){
-    let url="https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByPin?pincode="+pin+"&date="+appDate;
+    let url="https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode="+pin+"&date="+appDate;
     let response= await fetch(url,{
         method: 'GET', // *GET, POST, PUT, DELETE, etc.
         headers: {
@@ -107,24 +115,52 @@ async function confirmOtp(){
 		body: reqdata
     });
     let data = await response.json();
-	document.getElementById("auth-token").value=data.token
+	document.getElementById("auth-token").value=data.token;
+	closeDialog("login");
     return data;
 
 }
 
-function checkLogin(){
-	let token=document.getElementById("auth-token").value ? document.getElementById("auth-token").value.toString(): "";
-	if(token==""){
-		var dlgBody="<div class='segment'><label id='generateOtp'><input type='tel' id='mobile' placeholder='Mobile Number'/></label>&nbsp;<button class='unit' type='button' title='Generate OTP' onclick='generateOtp()'><span class='iconify' data-icon='emojione-monotone:mobile-phone-with-arrow' data-inline='false'></span></button><br/><label id='validateOtp'/></div>";
+async function checkLogin(){
+	var res=await getBeneficiaries();
+	if(!res){
+		var dlgBody="<div class='input-group'><label id='generateOtp'><input type='tel' id='mobile' placeholder='Mobile Number'/></label>&nbsp;<button class='unit' type='button' title='Generate OTP' onclick='generateOtp()'><span class='iconify' data-icon='emojione-monotone:mobile-phone-with-arrow' data-inline='false'></span></button><br/></div><br/><label id='validateOtp'/>";
 		showDialog("login","Login",dlgBody);
-		return;
+		return false;
 	}
 	else return true;
 }
 
+async function addBenDialog(){
+	if(!checkLogin())return;
+	var list=await getBeneficiaries();
+	var htmlStr="";
+	var j=1;
+	for(i=0; i<list.beneficiaries.length;i++){
+		var benId=list.beneficiaries[i].beneficiary_reference_id;
+		var benName=list.beneficiaries[i].name;
+		htmlStr+="<label><input type='checkbox' name='selectBen' id='selectBen' value='"+benId+"'><h3>"+(j++)+'. '+benName+" - </h3></label>&nbsp;<label><h4>"+benId+"</h4></label><br>";
+	
+	}
+	if(htmlStr!="")htmlStr+="<label><button id=\"addSel\" onclick=\"selectBenList()\">Add Selected</button></label>";
+showDialog("addBen","Select Beneficiary",htmlStr);
+//document.getElementById("benList").innerHTML=htmlStr==""?"No beneficiaries found for logged in user":htmlStr;
+}
+
+function selectBenList(){
+	var benList=document.getElementsByName("selectBen");
+	var htmlStr="";
+	
+	for(var j=0;j<benList.length;j++)
+	{
+		htmlStr+=benList[j].checked?benList[j].value+",":"";
+	}
+	document.getElementById("benList").innerHTML=htmlStr==""?"No beneficiaries found for logged in user":htmlStr;
+	closeDialog("addBen");
+}
+
 async function getBeneficiaries(){
 	let url="https://cdn-api.co-vin.in/api/v2/appointment/beneficiaries";
-	if(!checkLogin()) return;
 	let token=document.getElementById("auth-token").value ? document.getElementById("auth-token").value.toString(): "";
     this.bearer = "Bearer "+token;
 	let response= await fetch(url,{
@@ -134,9 +170,14 @@ async function getBeneficiaries(){
         'content-type': 'application/json',
 		'authorization': this.bearer
         }
-    });
+    }).catch(error => {
+	  console.log(response.status);
+	});
+	
+	if(!response.ok)return;
+
     let data = await response.json();
-	var htmlStr="";
+	/*var htmlStr="";
 	var j=1;
 	for(i=0; i<data.beneficiaries.length;i++){
 		var benId=data.beneficiaries[i].beneficiary_reference_id;
@@ -144,15 +185,15 @@ async function getBeneficiaries(){
 		htmlStr+="<div class=\"list\"><h3>"+(j++)+'. '+benName+" - </h3>&nbsp;<h4>"+benId+"</h4><br></div>";
 	
 	}
-	document.getElementById("response").innerHTML=htmlStr==""?"No beneficiaries found for logged in user":htmlStr;
+	document.getElementById("response").innerHTML=htmlStr==""?"No beneficiaries found for logged in user":htmlStr;*/
     return data;
 }
 
-async function _scheduleAppointment(sessId, bearer){
-    let beneficiary="50204571046980";
-    let dose='2';
-    let slot='09:00AM-11:00AM';
-    let reqdata='{"dose": '+dose+', "session_id": "'+sessId+'", "slot": "'+slot+'", "beneficiaries": ["'+beneficiary+'"]}'
+async function _scheduleAppointment(sessId, bearer, bens){
+    let beneficiary=bens.map(n=>n.toString());
+    let dose=this.dose;
+    let slot=this.slots[0];
+    let reqdata='{"dose": '+dose+', "session_id": "'+sessId+'", "slot": "'+slot+'", "beneficiaries": ['+beneficiary+']}'
     let url="https://cdn-api.co-vin.in/api/v2/appointment/schedule";
     let response= await fetch(url,{
         method: 'POST', // *GET, POST, PUT, DELETE, etc.
@@ -165,6 +206,10 @@ async function _scheduleAppointment(sessId, bearer){
     });
     let data = await response.json();
     return data;
+}
+
+function closeDialog(id){
+	$("#"+id).dialog( "close" );
 }
 
 function showDialog(id,title,body)

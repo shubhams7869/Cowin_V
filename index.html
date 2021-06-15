@@ -7,7 +7,7 @@
 		<script src="SHA256.js" ></script>
 		<script src="https://code.iconify.design/1/1.0.7/iconify.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<link rel="stylesheet" href="jquery-ui.css">
 		<link rel="stylesheet" href="/resources/demos/style.css">
 		<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -30,10 +30,43 @@
 				</div>
 				<br/>
 				<div class="input-group">
-					<label><input readonly type="text" id="auth-token" placeholder="Auth Token"/></label>
+					<label><input onchange="document.getElementById('scheduleAppt').disabled=false;" type="text" id="auth-token" placeholder="Auth Token"/></label>
 				</div>
-				<div class='segment'><button class="red" type="button" onclick="run()" disabled="true">Schedule Appointment &nbsp; <span class="iconify" data-icon="ion:arrow-forward" data-inline="false"></span></button></div>
-				
+				<br/>
+				<div class="input-group">
+					<label>Cost: </label>
+					<label><select id="fee_type" name="fee_type">
+					  <option value="all">All</option>
+					  <option value="free">Free</option>
+					  <option value="paid">Paid</option>
+					</select></label>
+					&nbsp;
+					<label>Age: </label>
+					<label><select id="min_age_limit" name="min_age_limit">
+					  <option value="18">18-44</option>
+					  <option value="45">45+</option>
+					</select></label>
+					&nbsp;
+					<label>Vaccine: </label>
+					<label><select id="vaccine" name="vaccine">
+					  <option value="all">All</option>
+					  <option value="COVAXIN">COVAXIN</option>
+					  <option value="COVISHIELD">COVISHIELD</option>
+					  <option value="SPUTNIK V">SPUTNIK V</option>
+					</select></label>
+					&nbsp;
+					<label><select id="dose" name="dose">
+					  <option value="dose1">Dose 1</option>
+					  <option value="dose2">Dose 2</option>
+					</select></label>
+				</div>
+				<br/>
+				<div class="input-group">
+					<label><button type="button" id="addBen" onclick="addBenDialog()">Add Beneficiary</button></label>
+					<p id="benList"><p>
+				</div>
+				<div class='segment'><button class="red" id="scheduleAppt" type="button" onclick="execute()" disabled="true">Schedule Appointment &nbsp; <span class="iconify" data-icon="ion:arrow-forward" data-inline="false"></span></button></div>
+				<br/>
 				<div class="segment">
 					<button class="unit" type="button" title="Get Beneficiaries" onclick="getBeneficiaries()"><span class="iconify" data-icon="ion:people" data-inline="false"></span></button>
 					<button class="unit" type="button"><span class="iconify" data-icon="ion:newspaper" data-inline="false"></span></button>
