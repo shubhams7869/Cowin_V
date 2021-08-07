@@ -8,11 +8,7 @@ function App() {
         Cowin auto scheduling app
       </h1>
       <hr/>
-      <table width="100%" align="center">        
-        <tr>
-          <td><Tracker/></td>
-        </tr>
-      </table>
+      <Tracker/>
       <hr/>
     </div>
   );

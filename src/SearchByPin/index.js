@@ -28,9 +28,15 @@ export default class SearchByPin extends React.Component{
         });
         let data = await response.json();
         let list=[], cls='card ',sessList=[];
+        let filters=this.props.inpObj.nameFilters.split(',');
         for(let i=0;i<data.centers.length;++i){
+            if(this.props.inpObj.nameFilters!=='') {
+                if(filters.some(v => data.centers[i].name.toUpperCase().includes(v.toUpperCase())))
+                continue;
+            }
             if(this.props.inpObj.fee_type==='all'||data.centers[i].fee_type===this.props.inpObj.fee_type){
                 list.push(<br/>);
+                list.push(<Card className='card'><h3><b>{data.centers[i].name}</b> - {data.centers[i].fee_type}</h3><h5>{data.centers[i].address}</h5></Card>);
                 for(let j=0;j<data.centers[i].sessions.length;++j){
                     cls='card ';
                     if(parseInt(data.centers[i].sessions[j].available_capacity_dose1)>0){
@@ -46,7 +52,6 @@ export default class SearchByPin extends React.Component{
                             if(parseInt(this.props.inpObj.dose==="dose1"?	data.centers[i].sessions[j].available_capacity_dose1:data.centers[i].sessions[j].available_capacity_dose2)>0){
                                 sessList.push(data.centers[i].sessions[j]);                            
                             }
-                        list.push(<Card className='card'><h3><b>{data.centers[i].name}</b> - {data.centers[i].fee_type}</h3><h5>{data.centers[i].address}</h5></Card>);
                         list.push(
                         <Card className={cls}>
                             <h3>{data.centers[i].sessions[j].date}</h3>
@@ -62,7 +67,7 @@ export default class SearchByPin extends React.Component{
                 }
             }
         }
-        this.props.clbk(sessList);
+        if(sessList.length>0)this.props.clbk(sessList);
         this.setState({list:list});
         return data;
     

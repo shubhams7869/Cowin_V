@@ -80,9 +80,15 @@ export default class SearchByDist extends Component{
         }
         let data = await response.json();
         let cls,sessList=[];
+        let filters=this.props.inpObj.nameFilters.split(',');
         for(let i=0;i<data.centers.length;++i){
+            if(this.props.inpObj.nameFilters!=='') {
+                if(!filters.some(v => data.centers[i].name.toUpperCase().includes(v.toUpperCase())))
+                continue;
+            }
             if(data.centers[i].fee_type.toString()===this.props.inpObj.fee_type.toString()){
                 list.push(<br/>);
+                list.push(<Card className='card'><h3><b>{data.centers[i].name}</b> - {data.centers[i].fee_type}</h3><h5>{data.centers[i].address}</h5></Card>);
                 for(let j=0;j<data.centers[i].sessions.length;++j){
                     cls='card ';
                     if(parseInt(data.centers[i].sessions[j].available_capacity_dose1)>0){
@@ -99,7 +105,6 @@ export default class SearchByDist extends Component{
                                 sessList.push(data.centers[i].sessions[j]);                            
                             }
                         
-                            list.push(<Card className='card'><h3><b>{data.centers[i].name}</b> - {data.centers[i].fee_type}</h3><h5>{data.centers[i].address}</h5></Card>);
                             list.push(
                             <Card className={cls}>
                                 <h3>{data.centers[i].sessions[j].date}</h3>
@@ -115,7 +120,7 @@ export default class SearchByDist extends Component{
                 }
             }
         }
-        this.props.clbk(sessList);
+        if(sessList.length>0)this.props.clbk(sessList);
         this.setState({list:list});
         return data;
     }
@@ -136,6 +141,7 @@ export default class SearchByDist extends Component{
         disp.push(<Dropdown onChange={(e)=>{this.state_id=e.target.value;this.getDistricts()}} options={this.state.states} />);
         disp.push(<Dropdown onChange={(e)=>{this.dist=e.target.value}} options={this.state.dists} />);
         disp.push(<button onClick={this.clickHandler} >{this.state.tracker}</button>);
+        disp.push(<div><label>Filters- Cost: {this.props.inpObj.fee_type}, Age_limit: {this.props.inpObj.min_age_limit}, Vaccine: {this.props.inpObj.vaccine}, Dose: {this.props.inpObj.dose}</label></div>);
         disp=[...disp, ...this.state.list];
         return disp;
     }

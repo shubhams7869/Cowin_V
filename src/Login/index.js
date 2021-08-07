@@ -18,7 +18,7 @@ export default class Login extends React.Component {
         this.generateOTP=this.generateOTP.bind(this);
     }
 
-    reset = (logout)=>{
+    reset (logout){
         clearInterval(this.interval);
         this.setCookie('token','');
         if(logout){
@@ -187,7 +187,7 @@ export default class Login extends React.Component {
                 return;
             }
             return <div>
-                <input type='text' id='login' autoFocus={true} placeholder="Enter Mobile" value={this.state.mobile} />
+                <input type='text' id='login' autoFocus={true} placeholder="Enter Mobile" defaultValue={this.state.mobile} />
                 <button onClick={this.loginHandler}>{this.state.msg}</button>
             </div>
         }

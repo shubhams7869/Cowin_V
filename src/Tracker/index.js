@@ -10,7 +10,7 @@ export default class Tracker extends React.Component {
     constructor(){
         super();
         this.state={
-            appointment_id:''
+            appointment_id:null
         };
         this.outObj={
             token:'',
@@ -21,7 +21,8 @@ export default class Tracker extends React.Component {
             fee_type:'Free',
             min_age_limit:'18',
             dose:'dose1',
-            vaccine:'all'
+            vaccine:'all',
+            nameFilters:''
         };
         this.searchResponse=this.searchResponse.bind(this);
         this.loginResponse=this.loginResponse.bind(this);
@@ -77,6 +78,7 @@ export default class Tracker extends React.Component {
 
     scheduleAppointment(){
         let sessId,res;
+        if(this.state.appointment_id!==null) return;
         if(this.outObj.sesslist.length>0){
             let list=this.outObj.sesslist;
             for(let i=0; i<list.length;i++){
@@ -97,6 +99,7 @@ export default class Tracker extends React.Component {
         disp.push(
         <div>
             <table width="100%" align="center">
+                <tbody>
                 <tr>
                     <td colSpan='2'><Login onChange={this.loginResponse}/></td>
                 </tr>
@@ -109,7 +112,7 @@ export default class Tracker extends React.Component {
                         </select>
                     </td>
                     <td>Age: 
-                        <select id="min_age_limit" onChange={(e)=>{this.inpObj.min_age_limit=e.target.value}} name="min_age_limit" value={this.inpObj.min_age_limit}>
+                        <select id="min_age_limit" onChange={(e)=>{this.inpObj.min_age_limit=e.target.value}} name="min_age_limit" defaultValue={this.inpObj.min_age_limit}>
                             <option value="18">18+</option>
                             <option value="45">45+</option>
                         </select>
@@ -117,18 +120,21 @@ export default class Tracker extends React.Component {
                 </tr>
                 <tr>
                     <td>Vaccine: 
-                        <select id="vaccine" onChange={(e)=>{this.inpObj.vaccine=e.target.value;}} name="vaccine" value={this.inpObj.vaccine}>
+                        <select id="vaccine" onChange={(e)=>{this.inpObj.vaccine=e.target.value}} name="vaccine" defaultValue={this.inpObj.vaccine}>
                             <option value="all">All</option>
                             <option value="COVAXIN">COVAXIN</option>
                             <option value="COVISHIELD">COVISHIELD</option>
                             <option value="SPUTNIK V">SPUTNIK V</option>
                         </select>
                     </td>
-                    <td><select id="dose" disabled={this.outObj.bid!==''?true:false} onChange={(e)=>{this.inpObj.dose=e.target.value;}} name="dose" value={this.inpObj.dose}>
+                    <td><select id="dose" onChange={(e)=>{this.inpObj.dose=e.target.value}} name="dose" defaultValue={this.inpObj.dose}>
                             <option value="dose1">Dose 1</option>
                             <option value="dose2">Dose 2</option>
                         </select>
                     </td>
+                </tr>
+                <tr>
+                    <td colSpan='2'>Name Filter: <input type='text' placeholder="keyword to filter separated by comma(,)" onChange={e=>{this.inpObj.nameFilters=e.target.value}} /></td>
                 </tr>
                 <Router>
                 <tr>
@@ -147,7 +153,7 @@ export default class Tracker extends React.Component {
                         {this.scheduleAppointment()}
                     </td>
                 </tr>
-                
+                </tbody>
             </table>
             <hr/>
 
