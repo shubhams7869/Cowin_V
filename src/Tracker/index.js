@@ -49,14 +49,14 @@ export default class Tracker extends React.Component {
     }
     async _scheduleAppointment(sessId){
         let beneficiary=this.outObj.bid;
-        let dose=this.inpObj.dose;
+        let dose=this.inpObj.dose==="dose1"?1:2;
         let slot=this.slots[0];
         let token = this.outObj.token;
         let bearer = "Bearer " + token;
         //getCaptcha();	
         //let securityCode=this.securityCode;
         
-        let reqdata='{"dose": '+dose+', "session_id": "'+sessId+'", "slot": "'+slot+'", "beneficiaries": ['+beneficiary+']"}'
+        let reqdata='{"dose": "'+dose+'", "session_id": "'+sessId+'", "slot": "'+slot+'", "beneficiaries": ["'+beneficiary+'"]}'
         let url="https://cdn-api.co-vin.in/api/v2/appointment/schedule";
         let response= await fetch(url,{
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
