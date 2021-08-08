@@ -1,17 +1,19 @@
 .beneficiaries {
+    display: inline-flex;
+    gap: 0rem;
+    margin-bottom: 1rem;
     padding: 1rem;
-    background-color: rgb(31, 31, 31);
-    width: 50rem;
+    width: fit-content;
     max-width: 95%;
   }
 
 .beneficiary{
     border-radius: 12px;
-    display: inline;
+    display: inline-block;
     box-shadow: 0 1px 8px rgba(0, 0, 0, 0.25);
     padding: 1rem;
-    margin: 2rem auto;
-    width: 15rem;
+    margin: 0.5rem;
+    width:min-content;
     max-width: 95%;
 }
 

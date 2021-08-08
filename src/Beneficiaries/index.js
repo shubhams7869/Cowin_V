@@ -31,7 +31,7 @@ export class Beneficiaries extends React.Component {
 
         render() {            
             return (
-                <div>{this.list}</div>
+                <div className="beneficiaries">{this.list}</div>
             );
         }
 

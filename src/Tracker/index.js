@@ -3,6 +3,7 @@ import { Link, Route, MemoryRouter as Router} from 'react-router-dom';
 import Login from '../Login';
 import SearchByPin from "../SearchByPin";
 import SearchByDist from "../SearchByDist";
+import "./Tracker.css";
 
 
 export default class Tracker extends React.Component {
@@ -83,7 +84,7 @@ export default class Tracker extends React.Component {
             let list=this.outObj.sesslist;
             for(let i=0; i<list.length;i++){
                 sessId=list[i].session_id;
-                this.slots=list[0].slots;
+                this.slots=list[i].slots;
                 console.log("Trying to schedule Appointment...");
                 res = this._scheduleAppointment(sessId);
                 if(res.appointment_id) return <div>res.appointment_id</div>;
@@ -104,45 +105,57 @@ export default class Tracker extends React.Component {
                     <td colSpan='2'><Login onChange={this.loginResponse}/></td>
                 </tr>
                 <tr>
-                    <td>Cost: 
-                        <select id="fee_type" onChange={(e)=>{this.inpObj.fee_type=e.target.value}} name="fee_type" defaultValue={this.inpObj.fee_type}>
-                            <option value="all">All</option>
-                            <option value="Free">Free</option>
-                            <option value="Paid">Paid</option>
-                        </select>
-                    </td>
-                    <td>Age: 
-                        <select id="min_age_limit" onChange={(e)=>{this.inpObj.min_age_limit=e.target.value}} name="min_age_limit" defaultValue={this.inpObj.min_age_limit}>
-                            <option value="18">18+</option>
-                            <option value="45">45+</option>
-                        </select>
+                    <td colSpan='2'>
+                        <div className="filter">
+                            <div className="tracker__controls">
+                                <div className="tracker__control">
+                                    <label>Cost: </label>
+                                    <select id="fee_type" onChange={(e)=>{this.inpObj.fee_type=e.target.value}} name="fee_type" defaultValue={this.inpObj.fee_type}>
+                                        <option value="all">All</option>
+                                        <option value="Free">Free</option>
+                                        <option value="Paid">Paid</option>
+                                    </select>
+                                </div>
+                                <div className="tracker__control">
+                                    <label>Age: </label> 
+                                    <select id="min_age_limit" onChange={(e)=>{this.inpObj.min_age_limit=e.target.value}} name="min_age_limit" defaultValue={this.inpObj.min_age_limit}>
+                                        <option value="18">18+</option>
+                                        <option value="45">45+</option>
+                                    </select>
+                                </div>
+                                <div className="tracker__control">
+                                    <label>Vaccine: </label>
+                                    <select id="vaccine" onChange={(e)=>{this.inpObj.vaccine=e.target.value}} name="vaccine" defaultValue={this.inpObj.vaccine}>
+                                        <option value="all">All</option>
+                                        <option value="COVAXIN">COVAXIN</option>
+                                        <option value="COVISHIELD">COVISHIELD</option>
+                                        <option value="SPUTNIK V">SPUTNIK V</option>
+                                    </select>
+                                </div>
+                                <div className="tracker__control">
+                                    <label>Name Filter: </label>
+                                    <input type='text' placeholder="keyword to filter separated by comma(,)" onChange={e=>{this.inpObj.nameFilters=e.target.value}} />
+                                </div>
+                                <div className="tracker__control">
+                                    <select id="dose" onChange={(e)=>{this.inpObj.dose=e.target.value}} name="dose" defaultValue={this.inpObj.dose}>
+                                        <option value="dose1">Dose 1</option>
+                                        <option value="dose2">Dose 2</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                     </td>
                 </tr>
                 <tr>
-                    <td>Vaccine: 
-                        <select id="vaccine" onChange={(e)=>{this.inpObj.vaccine=e.target.value}} name="vaccine" defaultValue={this.inpObj.vaccine}>
-                            <option value="all">All</option>
-                            <option value="COVAXIN">COVAXIN</option>
-                            <option value="COVISHIELD">COVISHIELD</option>
-                            <option value="SPUTNIK V">SPUTNIK V</option>
-                        </select>
-                    </td>
-                    <td><select id="dose" onChange={(e)=>{this.inpObj.dose=e.target.value}} name="dose" defaultValue={this.inpObj.dose}>
-                            <option value="dose1">Dose 1</option>
-                            <option value="dose2">Dose 2</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td colSpan='2'>Name Filter: <input type='text' placeholder="keyword to filter separated by comma(,)" onChange={e=>{this.inpObj.nameFilters=e.target.value}} /></td>
+                    <td colSpan='2'></td>
                 </tr>
                 <Router>
-                <tr>
-                    <td><Link to='/pin' >Search By Pincode</Link></td>
-                    <td><Link to='/dist'>Search By District</Link></td>
+                <tr className='tabs'>
+                    <td><Link to='/pin' className="tab">Search By Pincode</Link></td>
+                    <td><Link to='/dist' className="tab">Search By District</Link></td>
                 </tr>
                 <tr>
-                    <td colSpan='2'>
+                    <td colSpan='2' className="filter">
                         <Route path='/pin'><SearchByPin inpObj={this.inpObj} clbk={this.searchResponse}/></Route>
                         <Route path='/dist'><SearchByDist inpObj={this.inpObj} clbk={this.searchResponse}/></Route>
                     </td>
@@ -155,7 +168,6 @@ export default class Tracker extends React.Component {
                 </tr>
                 </tbody>
             </table>
-            <hr/>
 
         </div>);
 

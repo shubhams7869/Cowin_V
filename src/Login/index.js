@@ -1,6 +1,7 @@
 import React from 'react';
 import sha256 from '../SHA256';
 import { Beneficiaries } from '../Beneficiaries';
+import './Login.css';
 
 export default class Login extends React.Component {
 
@@ -105,7 +106,7 @@ export default class Login extends React.Component {
             this.setState({
                 mobile: mobile,
                 msg: "Confirm OTP"
-            });
+            },this.myLogin);
             document.getElementById('login').value = "";
         }
 
@@ -182,7 +183,7 @@ export default class Login extends React.Component {
                     token:this.getCookie("token")
                 });
             }
-            else if(this.state.mobile && this.state.mobile!==''){
+            else if(this.state.mobile && this.state.mobile!==null){
                 this.loginHandler();
                 return;
             }
@@ -205,13 +206,13 @@ export default class Login extends React.Component {
         else if(this.state.msg==="Logged In"){
             this.interval = setInterval(() => { this.getBeneficiaries()}, 300000);
             this.props.onChange(this.state.benList,this.state.token);
-            return <div><Beneficiaries benList={this.state.benList} onClick={()=>this.props.onChange(this.state.benList,this.state.token)}/><br/><button onClick={()=>{this.reset(true)}}>Logout</button></div>
+            return <div><Beneficiaries benList={this.state.benList} onClick={()=>this.props.onChange(this.state.benList,this.state.token)}/><button onClick={()=>{this.reset(true)}}>Logout</button></div>
         }
         
     }
     render() {
         return (
-            <div>{this.myLogin()}</div>
+            <div className="login">{this.myLogin()}</div>
         );
     }
 }

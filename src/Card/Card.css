@@ -9,6 +9,13 @@
     display: inline-block;
 }
 
+.session{
+    border-radius: 7px;
+    padding: 0.5rem;
+    width: 10rem;
+    margin: 0.5rem auto;
+}
+
 .booked{
     background-color: red;
 }

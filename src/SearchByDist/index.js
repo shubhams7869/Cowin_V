@@ -88,7 +88,6 @@ export default class SearchByDist extends Component{
             }
             if(data.centers[i].fee_type.toString()===this.props.inpObj.fee_type.toString()){
                 list.push(<br/>);
-                list.push(<Card className='card'><h3><b>{data.centers[i].name}</b> - {data.centers[i].fee_type}</h3><h5>{data.centers[i].address}</h5></Card>);
                 for(let j=0;j<data.centers[i].sessions.length;++j){
                     cls='card ';
                     if(parseInt(data.centers[i].sessions[j].available_capacity_dose1)>0){
@@ -102,11 +101,13 @@ export default class SearchByDist extends Component{
                     if(this.props.inpObj.vaccine==="all"||data.centers[i].sessions[j].vaccine===this.props.inpObj.vaccine){                            
                         if(data.centers[i].sessions[j].min_age_limit===this.props.inpObj.min_age_limit ||data.centers[i].sessions[j].allow_all_age){
                             if(parseInt(this.props.inpObj.dose==="dose1"?	data.centers[i].sessions[j].available_capacity_dose1:data.centers[i].sessions[j].available_capacity_dose2)>0){
-                                sessList.push(data.centers[i].sessions[j]);                            
+                                sessList.push(data.centers[i].sessions[j]);
                             }
-                        
+                            cls+=" session";
+                            //list.push(<Card className='card'><h3><b>{data.centers[i].name}</b> - {data.centers[i].fee_type}</h3><h5>{data.centers[i].address}</h5></Card>);
                             list.push(
                             <Card className={cls}>
+                                <h3><b>{data.centers[i].name}</b> - {data.centers[i].fee_type}</h3>
                                 <h3>{data.centers[i].sessions[j].date}</h3>
                                 <h5>{data.centers[i].sessions[j].min_age_limit==='18'||data.centers[i].sessions[j].allow_all_age?"18 & above":"45+"}<br/>
                                     Slots Available: {data.centers[i].sessions[j].vaccine}<br/>
