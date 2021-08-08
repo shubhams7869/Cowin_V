@@ -28,15 +28,15 @@ export default class SearchByPin extends React.Component{
         });
         let data = await response.json();
         let list=[], cls='card ',sessList=[];
+
         let filters=this.props.inpObj.nameFilters.split(',');
         for(let i=0;i<data.centers.length;++i){
             if(this.props.inpObj.nameFilters!=='') {
-                if(filters.some(v => data.centers[i].name.toUpperCase().includes(v.toUpperCase())))
+                if(!filters.some(v => data.centers[i].name.toUpperCase().includes(v.toUpperCase())))
                 continue;
             }
-            if(this.props.inpObj.fee_type==='all'||data.centers[i].fee_type===this.props.inpObj.fee_type){
+            if(data.centers[i].fee_type.toString()===this.props.inpObj.fee_type.toString()){
                 list.push(<br/>);
-                list.push(<Card className='card'><h3><b>{data.centers[i].name}</b> - {data.centers[i].fee_type}</h3><h5>{data.centers[i].address}</h5></Card>);
                 for(let j=0;j<data.centers[i].sessions.length;++j){
                     cls='card ';
                     if(parseInt(data.centers[i].sessions[j].available_capacity_dose1)>0){
@@ -50,17 +50,20 @@ export default class SearchByPin extends React.Component{
                     if(this.props.inpObj.vaccine==="all"||data.centers[i].sessions[j].vaccine===this.props.inpObj.vaccine){                            
                         if(data.centers[i].sessions[j].min_age_limit===this.props.inpObj.min_age_limit ||data.centers[i].sessions[j].allow_all_age){
                             if(parseInt(this.props.inpObj.dose==="dose1"?	data.centers[i].sessions[j].available_capacity_dose1:data.centers[i].sessions[j].available_capacity_dose2)>0){
-                                sessList.push(data.centers[i].sessions[j]);                            
+                                sessList.push(data.centers[i].sessions[j]);
                             }
-                        list.push(
-                        <Card className={cls}>
-                            <h3>{data.centers[i].sessions[j].date}</h3>
-                            <h5>{data.centers[i].sessions[j].min_age_limit==='18'||data.centers[i].sessions[j].allow_all_age?"18 & above":"45+"}<br/>
-                                Slots Available: {data.centers[i].sessions[j].vaccine}<br/>
-                                Dose 1: {data.centers[i].sessions[j].available_capacity_dose1}<br/>
-                                Dose 2: {data.centers[i].sessions[j].available_capacity_dose2}
-                            </h5>
-                        </Card>);
+                            cls+=" session";
+                            //list.push(<Card className='card'><h3><b>{data.centers[i].name}</b> - {data.centers[i].fee_type}</h3><h5>{data.centers[i].address}</h5></Card>);
+                            list.push(
+                            <Card className={cls}>
+                                <h3><b>{data.centers[i].name}</b> - {data.centers[i].fee_type}</h3>
+                                <h3>{data.centers[i].sessions[j].date}</h3>
+                                <h5>{data.centers[i].sessions[j].min_age_limit==='18'||data.centers[i].sessions[j].allow_all_age?"18 & above":"45+"}<br/>
+                                    Slots Available: {data.centers[i].sessions[j].vaccine}<br/>
+                                    Dose 1: {data.centers[i].sessions[j].available_capacity_dose1}<br/>
+                                    Dose 2: {data.centers[i].sessions[j].available_capacity_dose2}
+                                </h5>
+                            </Card>);
                             
                         }
                     }                                
@@ -70,7 +73,6 @@ export default class SearchByPin extends React.Component{
         if(sessList.length>0)this.props.clbk(sessList);
         this.setState({list:list});
         return data;
-    
     }
     clickHandler(){
         if(this.state.tracker==="Track"){
