@@ -16,6 +16,7 @@ export default class Tracker extends React.Component {
         this.outObj={
             token:'',
             bid:'',
+            appointment:null,
             sesslist:[]
         }
         this.inpObj={
@@ -71,6 +72,7 @@ export default class Tracker extends React.Component {
         });
         if(!response.ok) return;
         let data = await response.json();
+        this.outObj.appointment='booked';
         this.setState({
             appointment_id:data.appointment_id
         });
@@ -79,7 +81,7 @@ export default class Tracker extends React.Component {
 
     scheduleAppointment(){
         let sessId,res;
-        if(this.state.appointment_id!==null) return;
+        if(this.outObj.appointment==='booked' || this.state.appointment_id!==null) return;
         if(this.outObj.sesslist.length>0){
             let list=this.outObj.sesslist;
             for(let i=0; i<list.length;i++){

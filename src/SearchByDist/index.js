@@ -86,7 +86,7 @@ export default class SearchByDist extends Component{
                 if(!filters.some(v => data.centers[i].name.toUpperCase().includes(v.toUpperCase())))
                 continue;
             }
-            if(data.centers[i].fee_type.toString()===this.props.inpObj.fee_type.toString()){
+            if(this.props.inpObj.fee_type.toString()==='all' || data.centers[i].fee_type.toString()===this.props.inpObj.fee_type.toString()){
                 list.push(<br/>);
                 for(let j=0;j<data.centers[i].sessions.length;++j){
                     cls='card ';
