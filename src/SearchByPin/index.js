@@ -1,5 +1,5 @@
 import React from "react";
-import Card from "../Card";
+import Sessions from "../Sessions";
 
 export default class SearchByPin extends React.Component{
     
@@ -16,6 +16,7 @@ export default class SearchByPin extends React.Component{
     }
 
     async getListByPin(){
+        let list=[];
         let newDate = new Date();
         let appDate=newDate.getDate()+'-'+(newDate.getMonth()+1)+'-'+newDate.getFullYear();
         let url="https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode="+this.pin+"&date="+appDate;
@@ -27,50 +28,8 @@ export default class SearchByPin extends React.Component{
             }
         });
         let data = await response.json();
-        let list=[], cls='card ',sessList=[];
-
-        let filters=this.props.inpObj.nameFilters.split(',');
-        for(let i=0;i<data.centers.length;++i){
-            if(this.props.inpObj.nameFilters!=='') {
-                if(!filters.some(v => data.centers[i].name.toUpperCase().includes(v.toUpperCase())))
-                continue;
-            }
-            if(this.props.inpObj.fee_type.toString()==='all' || data.centers[i].fee_type.toString()===this.props.inpObj.fee_type.toString()){
-                list.push(<br/>);
-                for(let j=0;j<data.centers[i].sessions.length;++j){
-                    cls='card ';
-                    if(parseInt(data.centers[i].sessions[j].available_capacity_dose1)>0){
-                        if(parseInt(data.centers[i].sessions[j].available_capacity_dose2)>0) cls+='available';
-                        else cls+='partial';
-                    }
-                    else if(parseInt(data.centers[i].sessions[j].available_capacity_dose2)>0) cls+='partial';
-                    else cls+='booked';
-                    console.log(this.props.inpObj);
-                    
-                    if(this.props.inpObj.vaccine==="all"||data.centers[i].sessions[j].vaccine===this.props.inpObj.vaccine){                            
-                        if(data.centers[i].sessions[j].min_age_limit===this.props.inpObj.min_age_limit ||data.centers[i].sessions[j].allow_all_age){
-                            if(parseInt(this.props.inpObj.dose==="dose1"?	data.centers[i].sessions[j].available_capacity_dose1:data.centers[i].sessions[j].available_capacity_dose2)>0){
-                                sessList.push(data.centers[i].sessions[j]);
-                            }
-                            cls+=" session";
-                            //list.push(<Card className='card'><h3><b>{data.centers[i].name}</b> - {data.centers[i].fee_type}</h3><h5>{data.centers[i].address}</h5></Card>);
-                            list.push(
-                            <Card className={cls}>
-                                <h3><b>{data.centers[i].name}</b> - {data.centers[i].fee_type}</h3>
-                                <h3>{data.centers[i].sessions[j].date}</h3>
-                                <h5>{data.centers[i].sessions[j].min_age_limit==='18'||data.centers[i].sessions[j].allow_all_age?"18 & above":"45+"}<br/>
-                                    Slots Available: {data.centers[i].sessions[j].vaccine}<br/>
-                                    Dose 1: {data.centers[i].sessions[j].available_capacity_dose1}<br/>
-                                    Dose 2: {data.centers[i].sessions[j].available_capacity_dose2}
-                                </h5>
-                            </Card>);
-                            
-                        }
-                    }                                
-                }
-            }
-        }
-        if(this.props.inpObj.appointment===null&&sessList.length>0)this.props.clbk(sessList);
+        list.push(<Sessions inpObj={this.props.inpObj} data={data} clbk={this.props.clbk}/>)
+        //if(this.props.inpObj.appointment===null&&sessList.length>0)this.props.clbk(sessList);
         this.setState({list:list});
         return data;
     }
@@ -83,6 +42,12 @@ export default class SearchByPin extends React.Component{
             clearInterval(this.intId);
             this.setState({tracker:"Track"});
         }
+    }
+
+    componentWillUnmount(){
+        if(this.intId)
+            clearInterval(this.intId);
+        this.setState({tracker:"Track"});
     }
 
     display(){

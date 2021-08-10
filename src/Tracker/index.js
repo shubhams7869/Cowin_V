@@ -55,7 +55,7 @@ export default class Tracker extends React.Component {
         let beneficiary=this.outObj.bid;
         let dose=this.inpObj.dose==="dose1"?1:2;
         let slot=this.slots[0];
-        let token = this.inpObj.token;
+        let token = this.outObj.token;
         let bearer = "Bearer " + token;
         //getCaptcha();	
         //let securityCode=this.securityCode;
@@ -90,7 +90,7 @@ export default class Tracker extends React.Component {
             for(let i=0; i<list.length;i++){
                 sessId=list[i].session_id;
                 this.slots=list[i].slots;
-                console.log("Trying to schedule Appointment...");
+                console.log("Trying to schedule Appointment..."+this.outObj.token);
                 if(this.inpObj.appointment===null)
                     res = await this._scheduleAppointment(sessId);
                 console.log('scheduleAppointment -- '+this.inpObj.appointment);
@@ -112,7 +112,7 @@ export default class Tracker extends React.Component {
                 </tr>
                 <tr>
                     <td colSpan='2'>
-                        <div><label>Appointment: </label>{this.state.appointment_id===null?'Not scheduled':this.state.appointment_id}</div>
+                        <div><label>Appointment: </label>{this.inpObj.appointment===null?'Not scheduled':this.inpObj.appointment}</div>
                     </td>
                 </tr>
                 <tr>
