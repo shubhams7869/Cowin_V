@@ -70,7 +70,7 @@ export default class SearchByPin extends React.Component{
                 }
             }
         }
-        if(sessList.length>0)this.props.clbk(sessList);
+        if(this.props.inpObj.appointment===null&&sessList.length>0)this.props.clbk(sessList);
         this.setState({list:list});
         return data;
     }

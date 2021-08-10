@@ -121,7 +121,7 @@ export default class SearchByDist extends Component{
                 }
             }
         }
-        if(sessList.length>0)this.props.clbk(sessList);
+        if(this.props.inpObj.appointment===null&&sessList.length>0)this.props.clbk(sessList);
         this.setState({list:list});
         return data;
     }

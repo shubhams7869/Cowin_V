@@ -16,7 +16,6 @@ export default class Tracker extends React.Component {
         this.outObj={
             token:'',
             bid:'',
-            appointment:null,
             sesslist:[]
         }
         this.inpObj={
@@ -24,7 +23,8 @@ export default class Tracker extends React.Component {
             min_age_limit:'18',
             dose:'dose1',
             vaccine:'all',
-            nameFilters:''
+            nameFilters:'',
+            appointment:null,
         };
         this.searchResponse=this.searchResponse.bind(this);
         this.loginResponse=this.loginResponse.bind(this);
@@ -48,17 +48,19 @@ export default class Tracker extends React.Component {
 
     searchResponse(sessList){
         this.outObj.sesslist=sessList.length>0?[...sessList]:[];
-        if(this.outObj.bid!==''&&this.outObj.sesslist.length >0)this.scheduleAppointment();
+        console.log('searchResponse -- '+this.inpObj.appointment);
+        if(this.inpObj.appointment===null&&this.outObj.bid!==''&&this.outObj.sesslist.length >0)this.scheduleAppointment();
     }
     async _scheduleAppointment(sessId){
         let beneficiary=this.outObj.bid;
         let dose=this.inpObj.dose==="dose1"?1:2;
         let slot=this.slots[0];
-        let token = this.outObj.token;
+        let token = this.inpObj.token;
         let bearer = "Bearer " + token;
         //getCaptcha();	
         //let securityCode=this.securityCode;
-        
+        this.inpObj.appointment='booking';
+        console.log('_schedulingAppointment -- '+this.inpObj.appointment);
         let reqdata='{"dose": "'+dose+'", "session_id": "'+sessId+'", "slot": "'+slot+'", "beneficiaries": ["'+beneficiary+'"]}'
         let url="https://cdn-api.co-vin.in/api/v2/appointment/schedule";
         let response= await fetch(url,{
@@ -70,27 +72,29 @@ export default class Tracker extends React.Component {
             },
             body: reqdata // body data type must match "Content-Type" header
         });
-        if(!response.ok) return;
+        if(!response.ok){ this.inpObj.appointment=null;return;}
         let data = await response.json();
-        this.outObj.appointment='booked';
+        this.inpObj.appointment='booked';
+        console.log('_schedulingAppointment -- '+this.inpObj.appointment);
         this.setState({
             appointment_id:data.appointment_id
         });
         return data;
     }
 
-    scheduleAppointment(){
+    async scheduleAppointment(){
         let sessId,res;
-        if(this.outObj.appointment==='booked' || this.state.appointment_id!==null) return;
+        if(this.inpObj.appointment!==null || this.state.appointment_id!==null) return;
         if(this.outObj.sesslist.length>0){
             let list=this.outObj.sesslist;
             for(let i=0; i<list.length;i++){
                 sessId=list[i].session_id;
                 this.slots=list[i].slots;
                 console.log("Trying to schedule Appointment...");
-                res = this._scheduleAppointment(sessId);
-                if(res.appointment_id) return <div>res.appointment_id</div>;
-                console.log(res);
+                if(this.inpObj.appointment===null)
+                    res = await this._scheduleAppointment(sessId);
+                console.log('scheduleAppointment -- '+this.inpObj.appointment);
+                if(res&&res.appointment_id) return <div>res.appointment_id</div>;
             }
         }
         else if(this.state.appointment_id){
@@ -105,6 +109,11 @@ export default class Tracker extends React.Component {
                 <tbody>
                 <tr>
                     <td colSpan='2'><Login onChange={this.loginResponse}/></td>
+                </tr>
+                <tr>
+                    <td colSpan='2'>
+                        <div><label>Appointment: </label>{this.state.appointment_id===null?'Not scheduled':this.state.appointment_id}</div>
+                    </td>
                 </tr>
                 <tr>
                     <td colSpan='2'>
@@ -163,11 +172,7 @@ export default class Tracker extends React.Component {
                     </td>
                 </tr>
                 </Router>
-                <tr>
-                    <td colSpan='2'>
-                        {this.scheduleAppointment()}
-                    </td>
-                </tr>
+                
                 </tbody>
             </table>
 
