@@ -88,7 +88,7 @@ export default class SearchByDist extends Component{
     clickHandler(){
         if(this.state.tracker==="Track"){
             console.log(this.dist);
-            this.intId=setInterval(()=>{this.getListByState()},8000);
+            this.intId=setInterval(()=>{this.getListByState()},1000);
             this.setState({tracker:"Stop"});
         }
         else{

@@ -35,7 +35,7 @@ export default class SearchByPin extends React.Component{
     }
     clickHandler(){
         if(this.state.tracker==="Track"){
-            this.intId=setInterval(()=>{this.getListByPin()},8000);
+            this.intId=setInterval(()=>{this.getListByPin()},1000);
             this.setState({tracker:"Stop"});
         }
         else{

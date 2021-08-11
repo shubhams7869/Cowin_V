@@ -26,7 +26,7 @@ export default class Login extends React.Component {
             console.log('Logging out!!');
             this.setState({
                 msg:"Send OTP",
-                mobile:''
+                mobile:null
             });
         }
         else{
@@ -83,7 +83,7 @@ export default class Login extends React.Component {
     
     async generateOTP() {
         let url = "https://cdn-api.co-vin.in/api/v2/auth/generateMobileOTP";
-        let mobile = this.state.mobile?this.state.mobile:document.getElementById('login').value;
+        let mobile = this.state.mobile!==null?this.state.mobile:document.getElementById('login').value;
         if (!mobile.match(/^\d{10}$/g)) {
             var msg = mobile ? 'Not a valid Mobile number!!' : 'Enter a mobile number!!';
             alert(msg);
@@ -106,7 +106,7 @@ export default class Login extends React.Component {
             this.setState({
                 mobile: mobile,
                 msg: "Confirm OTP"
-            },this.myLogin);
+            });
             document.getElementById('login').value = "";
         }
 
@@ -159,7 +159,7 @@ export default class Login extends React.Component {
                        
             return null;
         }
-        return  response.json();
+        return  await response.json();
     }
 
     async _getBeneficiaries(){
@@ -173,6 +173,7 @@ export default class Login extends React.Component {
                 });
                 return benList;
             });
+            this.interval = setInterval(() => { this.getBeneficiaries()}, 180000);
     }
     myLogin ()  {
         console.log("myLogin() called!!");
@@ -204,8 +205,7 @@ export default class Login extends React.Component {
         }
 
         else if(this.state.msg==="Logged In"){
-            this.interval = setInterval(() => { this.getBeneficiaries()}, 300000);
-            this.props.onChange(this.state.benList,this.state.token);
+            //this.props.onChange(this.state.benList,this.state.token);
             return <div><Beneficiaries benList={this.state.benList} onClick={()=>this.props.onChange(this.state.benList,this.state.token)}/><button onClick={()=>{this.reset(true)}}>Logout</button></div>
         }
         
