@@ -10,7 +10,7 @@ export default class Sessions extends React.Component{
     }
 
     display(){
-        let list=[],cls,sessList=[];
+        let list=[],cls;
         let filters=this.props.inpObj.nameFilters.split(',');
         for(let i=0;i<this.props.data.centers.length;++i){
             if(this.props.inpObj.nameFilters!=='') {
@@ -32,7 +32,7 @@ export default class Sessions extends React.Component{
                     if(this.props.inpObj.vaccine==="all"||this.props.data.centers[i].sessions[j].vaccine===this.props.inpObj.vaccine){                            
                         if(this.props.data.centers[i].sessions[j].min_age_limit===this.props.inpObj.min_age_limit ||this.props.data.centers[i].sessions[j].allow_all_age){
                             if(parseInt(this.props.inpObj.dose==="dose1"?this.props.data.centers[i].sessions[j].available_capacity_dose1:this.props.data.centers[i].sessions[j].available_capacity_dose2)>0){
-                                sessList.push(this.props.data.centers[i].sessions[j]);
+                                if(this.props.inpObj.appointment===null)this.props.clbk(this.props.data.centers[i].sessions[j]);//sessList.push(this.props.data.centers[i].sessions[j]);
                             }
                             cls+=" session";
                             list.push(
@@ -51,7 +51,6 @@ export default class Sessions extends React.Component{
                 }
             }
         }
-        if(this.props.inpObj.appointment===null&&sessList.length>0)this.props.clbk(sessList);
         return list;
     }
 

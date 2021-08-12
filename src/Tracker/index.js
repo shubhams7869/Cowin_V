@@ -15,8 +15,8 @@ export default class Tracker extends React.Component {
         };
         this.outObj={
             token:'',
-            bid:'',
-            sesslist:[]
+            bid:null,
+            session:null
         }
         this.inpObj={
             fee_type:'Free',
@@ -46,10 +46,10 @@ export default class Tracker extends React.Component {
         this.outObj.bid=benId;
     }
 
-    searchResponse(sessList){
-        this.outObj.sesslist=sessList.length>0?[...sessList]:[];
+    searchResponse(session){
         console.log('searchResponse -- '+this.inpObj.appointment);
-        if(this.inpObj.appointment===null&&this.outObj.bid!==''&&this.outObj.sesslist.length >0)this.scheduleAppointment();
+        this.outObj.session=session;
+        if(this.inpObj.appointment===null&&this.outObj.bid!==null)this.scheduleAppointment();
     }
     async _scheduleAppointment(sessId){
         let beneficiary=this.outObj.bid;
@@ -73,6 +73,7 @@ export default class Tracker extends React.Component {
             body: reqdata // body data type must match "Content-Type" header
         });
         if(!response.ok){ this.inpObj.appointment=null;return;}
+        
         let data = await response.json();
         this.inpObj.appointment='booked';
         console.log('_schedulingAppointment -- '+this.inpObj.appointment);
@@ -85,21 +86,19 @@ export default class Tracker extends React.Component {
     async scheduleAppointment(){
         let sessId,res;
         if(this.inpObj.appointment!==null || this.state.appointment_id!==null) return;
-        if(this.outObj.sesslist.length>0){
-            let list=this.outObj.sesslist;
-            for(let i=0; i<list.length;i++){
-                sessId=list[i].session_id;
-                this.slots=list[i].slots;
-                console.log("Trying to schedule Appointment..."+this.outObj.token);
-                if(this.inpObj.appointment===null)
-                    res = await this._scheduleAppointment(sessId);
-                console.log('scheduleAppointment -- '+this.inpObj.appointment);
-                if(res&&res.appointment_id) return <div>res.appointment_id</div>;
-            }
+        else if(this.outObj.session!==null){
+            sessId=this.outObj.session.session_id;
+            this.slots=this.outObj.session.slots;
+            console.log("Trying to schedule Appointment..."+this.outObj.token);
+            if(this.inpObj.appointment===null)
+                res = await this._scheduleAppointment(sessId);
+            console.log('scheduleAppointment -- '+this.inpObj.appointment);
+            if(res&&res.appointment_id) return <div>res.appointment_id</div>;
         }
         else if(this.state.appointment_id){
             return <div>{this.state.appointment_id}</div>
         }
+        return <div>this.outObj</div>
     }
     display(){
         let disp=[];
