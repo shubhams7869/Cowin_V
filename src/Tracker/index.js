@@ -11,7 +11,8 @@ export default class Tracker extends React.Component {
     constructor(){
         super();
         this.state={
-            appointment_id:null
+            appointment_id:null,
+            disableFilter:false
         };
         this.outObj={
             token:'',
@@ -30,18 +31,21 @@ export default class Tracker extends React.Component {
         this.loginResponse=this.loginResponse.bind(this);
     }
     loginResponse=(list,token)=>{
+        if(!list){this.setState({disableFilter:false}); return;}
         let ids=document.getElementsByName('benList');
         let benId='';
         for(let i=0;i<ids.length;++i){
             if(ids[i].checked===true){
                 benId=ids[i].value;
                 console.log(benId);
+                console.log(list[i]);
                 this.inpObj.min_age_limit=(new Date().getFullYear() - list[i].birth_year)>45?'45':'18';
-                this.inpObj.dose=list[i].vaccination_status==='partially vaccinated'?'dose2':'dose1';
+                this.inpObj.dose=list[i].vaccination_status==='Partially Vaccinated'?'dose2':'dose1';
                 this.inpObj.vaccine=this.inpObj.dose==='dose2'?list[i].vaccine:this.inpObj.vaccine;
                 break;
             }
         }
+        this.setState({disableFilter:true});
         this.outObj.token=token;
         this.outObj.bid=benId;
     }
@@ -128,14 +132,14 @@ export default class Tracker extends React.Component {
                                 </div>
                                 <div className="tracker__control">
                                     <label>Age: </label> 
-                                    <select id="min_age_limit" onChange={(e)=>{this.inpObj.min_age_limit=e.target.value}} name="min_age_limit" defaultValue={this.inpObj.min_age_limit}>
+                                    <select id="min_age_limit" onChange={(e)=>{this.inpObj.min_age_limit=e.target.value}} name="min_age_limit" disabled={this.state.disableFilter} defaultValue={this.inpObj.min_age_limit}>
                                         <option value="18">18+</option>
                                         <option value="45">45+</option>
                                     </select>
                                 </div>
                                 <div className="tracker__control">
                                     <label>Vaccine: </label>
-                                    <select id="vaccine" onChange={(e)=>{this.inpObj.vaccine=e.target.value}} name="vaccine" defaultValue={this.inpObj.vaccine}>
+                                    <select id="vaccine" onChange={(e)=>{this.inpObj.vaccine=e.target.value}} name="vaccine" disabled={this.state.disableFilter} defaultValue={this.inpObj.vaccine}>
                                         <option value="all">All</option>
                                         <option value="COVAXIN">COVAXIN</option>
                                         <option value="COVISHIELD">COVISHIELD</option>
@@ -147,7 +151,7 @@ export default class Tracker extends React.Component {
                                     <input type='text' placeholder="keyword to filter separated by comma(,)" onChange={e=>{this.inpObj.nameFilters=e.target.value}} />
                                 </div>
                                 <div className="tracker__control">
-                                    <select id="dose" onChange={(e)=>{this.inpObj.dose=e.target.value}} name="dose" defaultValue={this.inpObj.dose}>
+                                    <select id="dose" onChange={(e)=>{this.inpObj.dose=e.target.value}} name="dose" disabled={this.state.disableFilter} defaultValue={this.inpObj.dose}>
                                         <option value="dose1">Dose 1</option>
                                         <option value="dose2">Dose 2</option>
                                     </select>

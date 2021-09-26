@@ -35,6 +35,7 @@ export default class Login extends React.Component {
                 msg:"Send OTP"
             });
         }
+        this.props.onChange(null,null)
     }
 
     checkState(){
